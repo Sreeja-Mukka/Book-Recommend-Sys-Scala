@@ -1,0 +1,9 @@
+@(books: Seq[Book])
+
+@main("All-Books") {
+    <ul>
+    @for(book <- books) {
+        <li>@book.bname - @book.bauthor</li>
+    }
+    </ul>
+}
