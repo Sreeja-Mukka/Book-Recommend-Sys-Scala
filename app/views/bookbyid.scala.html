@@ -1,7 +1,7 @@
-@(books: Seq[Book])
+@(book: Book)
 
 @main("List of Books") {
-    <h1>Books</h1>
+    <h1>@book.bname -Details:</h1>
     <table>
         <thead>
             <tr>
@@ -11,11 +11,9 @@
                 <th>Book Ratings</th>
                 <th>Book Genre</th>
                 <th>Book Summary</th>
-                <th>View</th>
             </tr>
         </thead>
         <tbody>
-        @for(book <- books) {
             <tr>
                 <td>@book.bname</td>
                 <td>@book.bauthor</td>
@@ -23,11 +21,8 @@
                 <td>@book.brating</td>
                 <td>@book.bgenre</td>
                 <td>@book.bsummary</td>
-                <td>
-                    <a href="@routes.BookController.getBookById(book.bno)" >View Details</a>
-                </td>
             </tr>
-        }
         </tbody>
     </table>
+    <a href = "@routes.BookController.getBooks()" >List of Books</a>
 }

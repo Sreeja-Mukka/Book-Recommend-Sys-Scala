@@ -1,0 +1,64 @@
+@(books: Seq[Book])
+
+@main("List of Books") {
+    <h1>Books</h1>
+    <div>
+        <h2>Add New Books to the List:</h2>
+        <form action="@routes.BookController.createBook" method="post">
+
+            <label for="bookid">Book id:</label>
+            <input type="number" id="bookid" name="bno" required>
+            <br>
+            <label for="bookname">Enter the book name:</label>
+            <input type="text" id="bookname" name="bname" required>
+            <br>
+            <label for="bookauthor">Enter the name of the author:</label>
+            <input type="text" id="bookauthor" name="bauthor" required>
+            <br>
+            <label for="bookpub">Enter the published year of the book:</label>
+            <input type="number" id="bookpub" name="bpubyear" required>
+            <br>
+            <label for="bookrating">Enter the ratings of the book:</label>
+            <input type="number" id="bookrating" name="brating" required>
+            <br>
+            <label for="bookgenre">Enter the genre of the book:</label>
+            <input type="Text" id="bookgenre" name="bgenre" required>
+            <br>
+            <label for="booksum">Enter summary of the book:</label>
+            <textarea  id="booksum" name="bsummary" required ></textarea>
+            <br>
+            <input type="submit" value="Add Person">
+        </form>
+    </div>
+    <br>
+    <div>
+    <table>
+        <thead>
+            <tr>
+                <th>Book-Id</th>
+                <th>Book Name</th>
+                <th>Book Author</th>
+                <th>Book Published Year</th>
+                <th>Book Ratings</th>
+                <th>Book Genre</th>
+                <th>Book Summary</th>
+
+            </tr>
+        </thead>
+        <tbody>
+        @for(book <- books) {
+            <tr>
+                <td>@book.bno</td>
+                <td>@book.bname</td>
+                <td>@book.bauthor</td>
+                <td>@book.bpubyear</td>
+                <td>@book.brating</td>
+                <td>@book.bgenre</td>
+                <td>@book.bsummary</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+
+}

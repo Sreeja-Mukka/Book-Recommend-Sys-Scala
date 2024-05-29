@@ -6,17 +6,21 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
 
+#books-route
+GET     /books-list                    controllers.BookController.getBooks()
 
+GET     /books              controllers.BookController.index
+POST   /books                     controllers.BookController.createBook
 
-
-GET     /books                     controllers.BookController.getBooks()
 GET     /books/:id                 controllers.BookController.getBookById(id: Int)
 GET    /books/genre/:genre             controllers.BookController.getFilteredBooks(genre:String)
-POST   /books                     controllers.BookController.createBook
+
 DELETE  /books/:id                controllers.BookController.deleteBook(id:Int)
 
-
-
+#users-route
+#POST   /users                    controllers.UserController.createUser
+POST    /users                    controllers.UserController.loginSubmit
+GET    /users                    controllers.UserController.login
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

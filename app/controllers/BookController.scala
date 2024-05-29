@@ -13,14 +13,15 @@ class BookController @Inject()(bookRepo: BookRepository,
   implicit val personFormat: Format[Book] = Json.format[Book]
 
   def getBooks = Action.async {
-    bookRepo.list().map { book =>
-      Ok(Json.toJson(book))
+    bookRepo.list().map { books =>
+      {
+        Ok(views.html.books(books)) } // Ensure this matches the expected type in your view
     }
   }
 
   def getBookById(bid: Int) = Action.async {
     bookRepo.findBook(bid).map {
-      case Some(book) => Ok(Json.toJson(book))
+      case Some(book) => Ok(views.html.bookbyid(book))  //
       case None => NotFound
     }
   }
@@ -38,13 +39,34 @@ class BookController @Inject()(bookRepo: BookRepository,
     bookRepo.delete(bid).map(_ => NoContent)
   }
 
-  def createBook = Action.async(parse.json) { request =>
-    request.body.validate[Book].fold(
-      errors => Future.successful(BadRequest("Invalid JSON provided")),
-      book => {
-        bookRepo.add(book).map(_ => Created(Json.toJson(book)))
-      }
-    )
+  def index = Action.async { implicit request =>
+    bookRepo.list().map { books =>
+      Ok(views.html.AdminBooks(books))
+    }
   }
 
+  def createBook = Action.async { implicit request =>
+    request.body.asFormUrlEncoded match {
+      case Some(formData) =>
+        try {
+          val bno = formData("bno").head.toInt
+          val bname = formData("bname").head
+          val bauthor = formData("bauthor").head
+          val bpub = formData("bpubyear").head.toInt
+          val brating = formData("brating").head.toInt
+          val bgenre = formData("bgenre").head
+          val bsummary = formData("bsummary").head
+          val newBook = Book(bno, bname, bauthor, bsummary, bpub, brating, bgenre)
+
+          bookRepo.add(newBook).map { _ =>
+            Redirect(routes.BookController.index) // Ensure correct function call
+          }
+        } catch {
+          case e: NoSuchElementException => Future.successful(BadRequest("Missing form data"))
+          case e: NumberFormatException => Future.successful(BadRequest("Invalid number format"))
+          case e: Exception => Future.successful(BadRequest("An error occurred: " + e.getMessage))
+        }
+      case None => Future.successful(BadRequest("Expecting form URL encoded body"))
+    }
+  }
 }

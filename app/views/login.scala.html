@@ -1,0 +1,14 @@
+@()
+
+@main("Login") {
+    <h1>Login</h1>
+    <form action="@routes.UserController.loginSubmit" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="uname" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="upassword" required>
+
+        <button type="submit">Login</button>
+    </form>
+}
