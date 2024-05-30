@@ -4,20 +4,27 @@
 
 @()(implicit request: Request[_], flash: Flash)
 @main("Login") {
-    <h1>Login</h1>
+
+
+    <div >
+        <h1>Login</h1>
+    <br>
 
     @helper.form(action = routes.UserController.loginSubmit) {
         <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
-
+        <br>
         <label for="username">Username:</label>
         <input type="text" id="username" name="uname" required>
-
+        <br>
         <label for="password">Password:</label>
         <input type="password" id="password" name="upassword" required>
-
+        <br>
         <button type="submit">Login</button>
     }
-
-    <h3>New User?Register here</h3>
+    <br>
+    </div>
+    <div>
+    <h3>New User? Register here</h3>
     <a href = "@routes.UserController.register" >Register</a>
+    </div>
 }

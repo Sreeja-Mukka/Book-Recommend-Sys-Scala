@@ -1,5 +1,6 @@
 package controllers
 
+import services.ProducerKafka
 import javax.inject._
 import play.api.mvc._
 import play.api.libs.json._
@@ -10,7 +11,7 @@ import play.api.inject.ApplicationLifecycle
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BookController @Inject()(bookRepo: BookRepository,
+class BookController @Inject()(bookRepo: BookRepository, prod: ProducerKafka,
                                cc: ControllerComponents,lifecycle: ApplicationLifecycle) (implicit ec: ExecutionContext) extends AbstractController(cc) {
   implicit val personFormat: Format[Book] = Json.format[Book]
 
@@ -24,9 +25,17 @@ class BookController @Inject()(bookRepo: BookRepository,
     }
   }
 
+  def getBooksBtGenre(bgen:String) : Future[Option[Seq[Book]]]= {
+    val books= bookRepo.findBooksByGen(bgen)
+    books
+  }
+
   def getBookById(bid: Int) = Action.async {
     bookRepo.findBook(bid).map {
       case Some(book) =>{
+        getBooksBtGenre(book.bgenre).map {
+          case Some(books) =>  prod.publishUserAction(book.bgenre,books)
+        }
         Ok(views.html.bookbyid(book))
       }
       case None => NotFound

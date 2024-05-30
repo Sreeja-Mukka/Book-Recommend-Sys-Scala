@@ -12,6 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(userrepo: UserRepository,
                                cc: ControllerComponents ) (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
+
   implicit val personFormat: Format[User] = Json.format[User]
 
   def register = Action { implicit request =>
@@ -28,21 +29,6 @@ class UserController @Inject()(userrepo: UserRepository,
         case false => BadRequest("Username already exists.")
       }
     }.getOrElse(Future.successful(BadRequest("Form data missing")))
-  }
-
-
-
-
-
-
-
-  def createUser = Action.async(parse.json) { request =>
-    request.body.validate[User].fold(
-      errors => Future.successful(BadRequest("Invalid JSON provided")),
-      book => {
-        userrepo.addUser(book).map(_ => Created(Json.toJson(book)))
-      }
-    )
   }
 
   def login = Action { implicit request: Request[AnyContent] =>
