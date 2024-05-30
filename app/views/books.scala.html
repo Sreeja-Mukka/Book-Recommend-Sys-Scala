@@ -22,10 +22,7 @@
             <tr>
                 <th>Book Name</th>
                 <th>Book Author</th>
-                <th>Book Published Year</th>
-                <th>Book Ratings</th>
                 <th>Book Genre</th>
-                <th>Book Summary</th>
                 <th>View</th>
             </tr>
         </thead>
@@ -34,10 +31,7 @@
             <tr>
                 <td>@book.bname</td>
                 <td>@book.bauthor</td>
-                <td>@book.bpubyear</td>
-                <td>@book.brating</td>
                 <td>@book.bgenre</td>
-                <td>@book.bsummary</td>
                 <td>
                     <a href="@routes.BookController.getBookById(book.bno)" >View Details</a>
                 </td>
@@ -45,4 +39,6 @@
         }
         </tbody>
     </table>
+
+    <a href = "@routes.UserController.login" >Logout</a>
 }
