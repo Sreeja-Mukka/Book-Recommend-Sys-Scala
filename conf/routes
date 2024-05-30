@@ -4,19 +4,27 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index()
+GET     /                           controllers.HomeController.index
+
+GET     /register                 controllers.UserController.register
+POST    /registerSubmit           controllers.UserController.registerSubmit
 
 #books-route
-GET     /books-list                    controllers.BookController.getBooks()
+GET     /books-list                    controllers.BookController.getBooks
 
-GET     /books              controllers.BookController.index
-POST   /books                     controllers.BookController.createBook
+GET     /adminBooks           controllers.BookController.index
+POST   /adminBooks                     controllers.BookController.createBook
+
+GET     /books    controllers.BookController.getBooks
+
 
 GET     /books/:id                 controllers.BookController.getBookById(id: Int)
-GET    /books/genre/:genre             controllers.BookController.getFilteredBooks(genre:String)
+
 
 DELETE  /books/:id                controllers.BookController.deleteBook(id:Int)
 
+#GET   /filter/:genre                       controllers.BookController.getFilter(genre:String)
+POST   /filter                       controllers.BookController.filter
 #users-route
 #POST   /users                    controllers.UserController.createUser
 POST    /users                    controllers.UserController.loginSubmit

@@ -7,7 +7,7 @@ import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class User (uno:Int , uname:String , upassword:String)
+case class User (uname:String , upassword:String)
 
 @Singleton
 class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
@@ -17,14 +17,15 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   import profile.api._
 
   private  class UserTable(tag: Tag) extends Table[User](tag, "user") {
-    def uno = column[Int]("uno", O.PrimaryKey)
+
     def uname = column[String]("uname")
     def upassword = column[String]("upassword")
 
-    override def * : ProvenShape[User] = (uno,uname,upassword) <> ((User.apply _).tupled, User.unapply)
+    override def * : ProvenShape[User] = (uname,upassword) <> ((User.apply _).tupled, User.unapply)
   }
 
-  private val users = TableQuery[UserTable]
+  private var users = TableQuery[UserTable]
+
 
   def addUser(user:User) :Future[Int] = {
     db.run(users += user)
@@ -37,6 +38,22 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
         Some(true)  // Password matches
       case _ =>
         None  // User not found or password doesn't match
+    }
+  }
+
+  def register(username: String, password: String): Future[Boolean] = {
+
+    val newuser = User(username,password)
+    if (username.length >= 2 && password.length >= 2) {
+      val userExists = db.run(users.filter(_.uname === username).exists.result)
+      userExists.flatMap {
+        case true =>
+          Future.successful(false) // Username already exists, return false
+        case false =>
+          db.run(users += newuser).map(_ => true) // Add user and return true
+      }
+    } else {
+      Future.successful(false) // Validation failed, return false
     }
   }
 }

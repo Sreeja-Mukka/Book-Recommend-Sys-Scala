@@ -3,39 +3,54 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import play.api.libs.json._
-import models.{BookRepository,Book}
+import models.{Book, BookRepository, User}
+import play.api.inject.ApplicationLifecycle
+
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BookController @Inject()(bookRepo: BookRepository,
-                               cc: ControllerComponents) (implicit ec: ExecutionContext) extends AbstractController(cc) {
+                               cc: ControllerComponents,lifecycle: ApplicationLifecycle) (implicit ec: ExecutionContext) extends AbstractController(cc) {
   implicit val personFormat: Format[Book] = Json.format[Book]
 
-  def getBooks = Action.async {
+
+  def getBooks = Action.async { implicit request =>
     bookRepo.list().map { books =>
-      {
-        Ok(views.html.books(books)) } // Ensure this matches the expected type in your view
+      Ok(views.html.books(books))  // Ensure 'books' template has implicit Request and Flash parameters
+    }.recover {
+      case ex: Exception =>
+        InternalServerError("An error occurred: " + ex.getMessage)
     }
   }
 
   def getBookById(bid: Int) = Action.async {
     bookRepo.findBook(bid).map {
-      case Some(book) => Ok(views.html.bookbyid(book))  //
+      case Some(book) =>{
+        Ok(views.html.bookbyid(book))
+      }
       case None => NotFound
     }
   }
 
-  def getFilteredBooks(genre: String) = Action.async {
-    bookRepo.findBooksByGen(genre).map {
-      case Some(books) => Ok(Json.toJson(books))
-      case None => NotFound("No books found for the given author")
-    } recover {
-      case ex: Exception => InternalServerError("An error occurred: " + ex.getMessage)
+  def filter = Action.async { implicit request: Request[AnyContent] =>
+    request.body.asFormUrlEncoded match {
+      case Some(formData) =>
+        formData.get("ugenre").flatMap(_.headOption) match {
+          case Some(genre) =>
+            bookRepo.findBooksByGen(genre).map {
+              case Some(books) => Ok(views.html.books(books))
+              case None => NotFound(s"Books of type $genre not found!")
+            }
+          case None =>
+            Future.successful(BadRequest("Genre not specified"))
+        }
+      case None =>
+        Future.successful(NotFound("Form data not found"))
     }
   }
 
- def deleteBook(bid: Int) = Action.async {
+  def deleteBook(bid: Int) = Action.async {
     bookRepo.delete(bid).map(_ => NoContent)
   }
 
@@ -69,4 +84,6 @@ class BookController @Inject()(bookRepo: BookRepository,
       case None => Future.successful(BadRequest("Expecting form URL encoded body"))
     }
   }
+
 }
+

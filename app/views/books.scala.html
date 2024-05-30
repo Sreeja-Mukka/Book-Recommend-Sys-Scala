@@ -1,7 +1,22 @@
-@(books: Seq[Book])
+@import play.filters.csrf.CSRF
+@import play.api.mvc.Request
+@import play.api.mvc.Flash
+
+@(books: Seq[Book])(implicit request: Request[_], flash: Flash)
 
 @main("List of Books") {
     <h1>Books</h1>
+    <h2>Filter the books, based on Genre:</h2>
+    <div>
+    @helper.form(action = routes.BookController.filter) {
+        <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
+            <label for="filter-genre">Books to be filtered by Genre: </label>
+            <input type="text" id="filter-genre" name="ugenre" required>
+
+            <button type="submit">Enter</button>
+    }
+    </div>
+
     <table>
         <thead>
             <tr>

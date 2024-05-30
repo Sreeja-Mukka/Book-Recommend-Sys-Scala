@@ -1,8 +1,14 @@
-@()
+@import play.filters.csrf.CSRF
+@import play.api.mvc.Request
+@import play.api.mvc.Flash
 
+@()(implicit request: Request[_], flash: Flash)
 @main("Login") {
     <h1>Login</h1>
-    <form action="@routes.UserController.loginSubmit" method="post">
+
+    @helper.form(action = routes.UserController.loginSubmit) {
+        <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
+
         <label for="username">Username:</label>
         <input type="text" id="username" name="uname" required>
 
@@ -10,5 +16,8 @@
         <input type="password" id="password" name="upassword" required>
 
         <button type="submit">Login</button>
-    </form>
+    }
+
+    <h3>New User?Register here</h3>
+    <a href = "@routes.UserController.register" >List of Books</a>
 }

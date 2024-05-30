@@ -1,10 +1,15 @@
-@(books: Seq[Book])
+@import play.filters.csrf.CSRF
+@import play.api.mvc.Request
+@import play.api.mvc.Flash
+
+@(books: Seq[Book])(implicit request: Request[_], flash: Flash)
 
 @main("List of Books") {
     <h1>Books</h1>
     <div>
         <h2>Add New Books to the List:</h2>
-        <form action="@routes.BookController.createBook" method="post">
+        @helper.form(action = routes.BookController.createBook) {
+            <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
 
             <label for="bookid">Book id:</label>
             <input type="number" id="bookid" name="bno" required>
@@ -28,7 +33,7 @@
             <textarea  id="booksum" name="bsummary" required ></textarea>
             <br>
             <input type="submit" value="Add Person">
-        </form>
+            }
     </div>
     <br>
     <div>

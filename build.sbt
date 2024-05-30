@@ -8,8 +8,8 @@ scalaVersion := "2.13.14"
 //akka
 libraryDependencies ++= Seq(
   guice,
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.6.17",
-  "com.typesafe.akka" %% "akka-stream" % "2.6.17"
+//  "com.typesafe.akka" %% "akka-actor-typed" % "2.6.17",
+//  "com.typesafe.akka" %% "akka-stream" % "2.6.17"
   // Add other dependencies here
 )
 //scala
@@ -36,6 +36,8 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "com.typesafe.akka" %% "akka-stream-kafka" % "6.0.0",
+  "com.typesafe.akka" %% "akka-http" % "10.6.3",
+  "com.typesafe.akka" %% "akka-http-spray-json" % "10.6.3",
   "org.apache.kafka" %% "kafka" % "3.7.0" // Kafka client
 )
 

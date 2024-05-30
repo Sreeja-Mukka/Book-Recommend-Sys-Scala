@@ -7,11 +7,34 @@ import models.{User, UserRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+
 @Singleton
 class UserController @Inject()(userrepo: UserRepository,
-                               cc: ControllerComponents ) (implicit ec: ExecutionContext) extends AbstractController(cc)  {
+                               cc: ControllerComponents ) (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   implicit val personFormat: Format[User] = Json.format[User]
+
+  def register = Action { implicit request =>
+    Ok(views.html.register())
+  }
+
+  def registerSubmit = Action.async { implicit request =>
+    val postVals = request.body.asFormUrlEncoded
+    postVals.map { args =>
+      val username = args("username").head
+      val password = args("password").head
+      userrepo.register(username, password).map {
+        case true => Redirect(routes.UserController.login) // Redirect to login on success
+        case false => BadRequest("Username already exists.")
+      }
+    }.getOrElse(Future.successful(BadRequest("Form data missing")))
+  }
+
+
+
+
+
+
 
   def createUser = Action.async(parse.json) { request =>
     request.body.validate[User].fold(
@@ -37,28 +60,21 @@ class UserController @Inject()(userrepo: UserRepository,
           case None => false    // User not found or password is incorrect
         }
 
-        userCheck.flatMap {
-          case true =>
-            // If userCheck is true, redirect to the main page with a success message
-            Future.successful(Redirect(routes.UserController.login).flashing("success" -> "User Logged In"))
-          case false =>
-            // If userCheck is false, redirect back to login with an error message
-            // re-direct to login
-            Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Invalid username or password"))
-        }
-
         if(username == "admin" && password == "password") {
-          //direct to admin listofbooks page
-          Future.successful(Redirect(routes.UserController.login))
+          Future.successful(Redirect(routes.BookController.index))
         }
         else{
-          //re-direct to login
-          Future.successful(Redirect(routes.UserController.login))
+          userCheck.flatMap {
+            case true =>
+              Future.successful(Redirect(routes.BookController.getBooks))
+            case false =>
+              Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Invalid username or password"))
+          }
         }
       }
       case None =>
-        // Handle the case where form data is not sent correctly
         Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Form data missing"))
     }
   }
+
 }
