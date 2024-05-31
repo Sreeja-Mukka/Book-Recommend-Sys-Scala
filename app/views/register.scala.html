@@ -6,13 +6,66 @@
 
 
 @main("Register User") {
-    <h2>Register here!</h2>
-    @helper.form(action = routes.UserController.registerSubmit) {
-        <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        <button type="submit">Register</button>
-    }
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Register</title>
+                <!-- Link to Bootstrap CSS -->
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                    .header-custom {
+                        background-color: #17a2b8; /* Teal background */
+                        color: white;
+                        padding: 10px;
+                        border-radius: 8px;
+                        margin-bottom: 20px; /* Space between header and form */
+                        text-align: center;
+                    }
+                    .form-container {
+                        background-color: #fff; /* White background for the form */
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Subtle shadow for depth */
+                        margin-bottom: 20px;
+                    }
+                    .form-group {
+                        margin-bottom: 15px; /* Spacing between form fields */
+                    }
+                    .btn-custom {
+                        background-color: #007bff; /* Bootstrap primary blue */
+                        color: #ffffff;
+                        border-radius: 5px;
+                        padding: 10px 15px;
+                        border: none;
+                        width: 100%; /* Full width button */
+                        margin-top: 10px;
+                    }
+            </style>
+        </head>
+        <body>
+            <div class="container mt-5">
+                <h2 class="header-custom">Register here!</h2>
+                <div class="form-container">
+                    @helper.form(action = routes.UserController.registerSubmit, Symbol("class") -> "needs-validation") {
+                    <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
+
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-custom">Register</button>
+                    </div>
+                }
+                </div>
+            </div>
+        </body>
+    </html>
 }

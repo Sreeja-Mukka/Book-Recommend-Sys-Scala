@@ -5,65 +5,129 @@
 @(books: Seq[Book])(implicit request: Request[_], flash: Flash)
 
 @main("List of Books") {
-    <h1>Books</h1>
-    <div>
-        <h2>Add New Books to the List:</h2>
-        @helper.form(action = routes.BookController.createBook) {
-            <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
-
-            <label for="bookid">Book id:</label>
-            <input type="number" id="bookid" name="bno" required>
-            <br>
-            <label for="bookname">Enter the book name:</label>
-            <input type="text" id="bookname" name="bname" required>
-            <br>
-            <label for="bookauthor">Enter the name of the author:</label>
-            <input type="text" id="bookauthor" name="bauthor" required>
-            <br>
-            <label for="bookpub">Enter the published year of the book:</label>
-            <input type="number" id="bookpub" name="bpubyear" required>
-            <br>
-            <label for="bookrating">Enter the ratings of the book:</label>
-            <input type="number" id="bookrating" name="brating" required>
-            <br>
-            <label for="bookgenre">Enter the genre of the book:</label>
-            <input type="Text" id="bookgenre" name="bgenre" required>
-            <br>
-            <label for="booksum">Enter summary of the book:</label>
-            <textarea  id="booksum" name="bsummary" required ></textarea>
-            <br>
-            <input type="submit" value="Add Person">
-            }
-    </div>
-    <br>
-    <div>
-    <table>
-        <thead>
-            <tr>
-                <th>Book-Id</th>
-                <th>Book Name</th>
-                <th>Book Author</th>
-                <th>Book Published Year</th>
-                <th>Book Ratings</th>
-                <th>Book Genre</th>
-                <th>Book Summary</th>
-
-            </tr>
-        </thead>
-        <tbody>
-        @for(book <- books) {
-            <tr>
-                <td>@book.bno</td>
-                <td>@book.bname</td>
-                <td>@book.bauthor</td>
-                <td>@book.bpubyear</td>
-                <td>@book.brating</td>
-                <td>@book.bgenre</td>
-                <td>@book.bsummary</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    </div>
-    <a href = "@routes.UserController.login" >Logout</a>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Books</title>
+                <!-- Link to Bootstrap CSS -->
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                    .header-custom {
+                        background-color: #17a2b8; /* Teal background for headers */
+                        color: white;
+                        padding: 10px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                    }
+                    .form-container {
+                        background-color: #fff; /* White background for form */
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Subtle shadow */
+                        margin-bottom: 20px;
+                    }
+                    .table-custom {
+                        background-color: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                        overflow: hidden;
+                    }
+                    .table thead th {
+                        background-color: #6c757d;
+                        color: #ffffff;
+                    }
+                    .btn-custom {
+                        background-color: #007bff; /* Bootstrap primary blue */
+                        color: #ffffff;
+                        border-radius: 5px;
+                        padding: 10px 15px;
+                        border: none;
+                        margin-top: 10px;
+                    }
+                    .btn-link-custom {
+                        color: #007bff;
+                        text-decoration: none;
+                        margin-top: 20px;
+                        display: inline-block;
+                        border-radius: 5px;
+                        border: 1px solid #007bff; /* Styled link as a button */
+                    }
+                    .btn-link-custom:hover {
+                        text-decoration: underline;
+                    }
+            </style>
+        </head>
+        <body>
+            <div class="container mt-5">
+                <h1 class="header-custom text-center">Books</h1>
+                <div class="form-container">
+                    <h2>Add New Books to the List:</h2>
+                    @helper.form(action = routes.BookController.createBook, Symbol("class") -> "needs-validation" ) {
+                        <input type="hidden" name="csrfToken" value="@CSRF.getToken(request).map(_.value).getOrElse("")">
+                        <div class="form-group">
+                            <label for="bookid">Book id:</label>
+                            <input type="number" id="bookid" name="bno" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookname">Enter the book name:</label>
+                            <input type="text" id="bookname" name="bname" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookauthor">Enter the name of the author:</label>
+                            <input type="text" id="bookauthor" name="bauthor" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookpub">Enter the published year of the book:</label>
+                            <input type="number" id="bookpub" name="bpubyear" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookrating">Enter the ratings of the book:</label>
+                            <input type="number" id="bookrating" name="brating" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookgenre">Enter the genre of the book:</label>
+                            <input type="text" id="bookgenre" name="bgenre" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="booksum">Enter summary of the book:</label>
+                            <textarea id="booksum" name="bsummary" class="form-control" required></textarea>
+                        </div>
+                        <input type="submit" value="Add Book" class="btn btn-custom">
+                        }
+                </div>
+                <div>
+                    <table class="table table-hover table-custom">
+                        <thead>
+                            <tr>
+                                <th>Book-Id</th>
+                                <th>Book Name</th>
+                                <th>Book Author</th>
+                                <th>Book Published Year</th>
+                                <th>Book Ratings</th>
+                                <th>Book Genre</th>
+                                <th>Book Summary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(book <- books) {
+                            <tr>
+                                <td>@book.bno</td>
+                                <td>@book.bname</td>
+                                <td>@book.bauthor</td>
+                                <td>@book.bpubyear</td>
+                                <td>@book.brating</td>
+                                <td>@book.bgenre</td>
+                                <td>@book.bsummary</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <a href="@routes.UserController.login" class="btn-link-custom">Logout</a>
+                </div>
+            </div>
+        </body>
+    </html>
 }

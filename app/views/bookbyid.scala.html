@@ -1,28 +1,62 @@
 @(book: Book)
 
 @main("List of Books") {
-    <h1>@book.bname -Details:</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Book Name</th>
-                <th>Book Author</th>
-                <th>Book Published Year</th>
-                <th>Book Ratings</th>
-                <th>Book Genre</th>
-                <th>Book Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@book.bname</td>
-                <td>@book.bauthor</td>
-                <td>@book.bpubyear</td>
-                <td>@book.brating</td>
-                <td>@book.bgenre</td>
-                <td>@book.bsummary</td>
-            </tr>
-        </tbody>
-    </table>
-    <a href = "@routes.BookController.getBooks" >List of Books</a>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Book Details</title>
+                <!-- Link to Bootstrap CSS -->
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                    .detail-container {
+                        background-color: #fff; /* White background for clarity */
+                        padding: 20px;
+                        border-radius: 8px; /* Rounded corners for modern look */
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Subtle shadow for depth */
+                        margin-bottom: 20px;
+                    }
+                    .detail-header {
+                        color: #ffffff;
+                        background-color: #17a2b8; /* Teal background */
+                        padding: 10px;
+                        border-radius: 8px; /* Rounded corners for header */
+                        margin-bottom: 15px; /* Space between header and details */
+                    }
+                    .detail-item {
+                        font-size: 16px; /* Slightly larger font for readability */
+                        padding: 5px 0; /* Padding for spacing between items */
+                    }
+                    .btn-link-custom {
+                        color: #17a2b8; /* Teal color to match the header */
+                        text-decoration: none;
+                    }
+                    .btn-link-custom:hover {
+                        text-decoration: underline;
+                    }
+            </style>
+        </head>
+        <body>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="detail-header text-center">
+                            <h1>@book.bname - Details</h1>
+                        </div>
+                        <div class="detail-container">
+                            <div class="detail-item"><strong>Book Name:</strong> @book.bname</div>
+                            <div class="detail-item"><strong>Author:</strong> @book.bauthor</div>
+                            <div class="detail-item"><strong>Published Year:</strong> @book.bpubyear</div>
+                            <div class="detail-item"><strong>Ratings:</strong> @book.brating</div>
+                            <div class="detail-item"><strong>Genre:</strong> @book.bgenre</div>
+                            <div class="detail-item"><strong>Summary:</strong> @book.bsummary</div>
+                        </div>
+                        <div class="text-center mb-4">
+                            <a href="@routes.BookController.getBooks" class="btn btn-link-custom">List of Books</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
 }
