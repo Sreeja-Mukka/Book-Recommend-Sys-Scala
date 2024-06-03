@@ -1,40 +1,76 @@
 package controllers
 
 import services.ProducerKafka
+
 import javax.inject._
-import play.api.mvc._
+import play.api.mvc.{request, _}
 import play.api.libs.json._
-import models.{Book, BookRepository, User}
+import models.{Book, BookRepository, User, UserViewedRepository}
 import play.api.inject.ApplicationLifecycle
 
-
+import scala.Option.option2Iterable
+import scala.collection.IterableOnce.iterableOnceExtensionMethods
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BookController @Inject()(bookRepo: BookRepository, prod: ProducerKafka,
+class BookController @Inject()(bookRepo: BookRepository, prod: ProducerKafka, viewrepo : UserViewedRepository,
                                cc: ControllerComponents,lifecycle: ApplicationLifecycle) (implicit ec: ExecutionContext) extends AbstractController(cc) {
-  implicit val personFormat: Format[Book] = Json.format[Book]
+  implicit val bookformat: Format[Book] = Json.format[Book]
 
 
   def getBooks = Action.async { implicit request =>
+    val user_id: Option[Int] = request.session.get("userId").flatMap { s =>
+      scala.util.Try(s.toInt).toOption
+    }
+
     bookRepo.list().map { books =>
-      Ok(views.html.books(books))  // Ensure 'books' template has implicit Request and Flash parameters
+      user_id match {
+        case Some(uid) =>
+          Ok(views.html.books(books, uid)) // Assuming your view takes books and uid as parameters
+        case None =>
+          Ok(views.html.books(books, -1)) // Assuming -1 indicates no user id
+      }
     }.recover {
       case ex: Exception =>
         InternalServerError("An error occurred: " + ex.getMessage)
     }
   }
 
+
   def getBooksBtGenre(bgen:String) : Future[Option[Seq[Book]]]= {
     val books= bookRepo.findBooksByGen(bgen)
     books
   }
 
-  def getBookById(bid: Int) = Action.async {
+//  def showUserBooks() = Action.async { implicit request =>
+//    request.session.get("userId").map(_.toInt) match {
+//      case Some(userId) =>
+//        viewrepo.getBooksViewedByUser(userId).map { books =>
+//          Ok(views.html.viewedBooks(books))
+//        }
+//      case None =>
+//        Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Please log in first"))
+//    }
+//  }
+def booksViewedByUser(userId: Int) = Action.async { implicit request: Request[AnyContent] =>
+  viewrepo.getBooksViewedByUser(userId).map { books =>
+    Ok(views.html.viewedBooks(books)) // Assuming you have a view to display books
+  }
+}
+
+  def getBookById(bid: Int) = Action.async { implicit request: Request[AnyContent] =>
+    val userIdOption: Option[Int] = request.session.get("userId").flatMap { s =>
+      scala.util.Try(s.toInt).toOption
+    }
+
+    userIdOption.foreach { uid =>
+      // Assuming you have a method to save or update the view
+      viewrepo.saveBookView(uid, bid)
+    }
     bookRepo.findBook(bid).map {
       case Some(book) =>{
         getBooksBtGenre(book.bgenre).map {
-          case Some(books) =>  prod.publishUserAction(book.bgenre,books)
+          case Some(books) => prod.publishUserAction(book.bgenre, books)
         }
         Ok(views.html.bookbyid(book))
       }
@@ -43,12 +79,13 @@ class BookController @Inject()(bookRepo: BookRepository, prod: ProducerKafka,
   }
 
   def filter = Action.async { implicit request: Request[AnyContent] =>
+
     request.body.asFormUrlEncoded match {
       case Some(formData) =>
         formData.get("ugenre").flatMap(_.headOption) match {
           case Some(genre) =>
             bookRepo.findBooksByGen(genre).map {
-              case Some(books) => Ok(views.html.books(books))
+              case Some(books) => Ok(views.html.books(books,0))
               case None => NotFound(s"Books of type $genre not found!")
             }
           case None =>
@@ -83,7 +120,7 @@ class BookController @Inject()(bookRepo: BookRepository, prod: ProducerKafka,
           val newBook = Book(bno, bname, bauthor, bsummary, bpub, brating, bgenre)
 
           bookRepo.add(newBook).map { _ =>
-            Redirect(routes.BookController.index) // Ensure correct function call
+            Redirect(routes.BookController.index)
           }
         } catch {
           case e: NoSuchElementException => Future.successful(BadRequest("Missing form data"))

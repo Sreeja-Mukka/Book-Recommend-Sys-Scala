@@ -27,6 +27,7 @@ class BookRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 
   private val books = TableQuery[BookTable]
 
+
   def list(): Future[Seq[Book]] = db.run(books.result)
 
   def findBook(bid: Int): Future[Option[Book]] = db.run(books.filter(_.bno === bid).result.headOption)

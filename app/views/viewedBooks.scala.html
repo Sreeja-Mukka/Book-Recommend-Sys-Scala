@@ -1,0 +1,97 @@
+@import play.filters.csrf.CSRF
+@import play.api.mvc.Request
+@import play.api.mvc.Flash
+
+@(books: Seq[Book])(implicit request: Request[_], flash: Flash)
+
+    @main("List of Books") {
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Books</title>
+                    <!-- Link to Bootstrap CSS -->
+                <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                        .header-custom {
+                            color: #ffffff;
+                            background-color: #17a2b8; /* Consistent teal background */
+                            padding: 10px;
+                            border-radius: 8px;
+                            margin-bottom: 20px; /* Space between header and content */
+                        }
+                        .table-custom {
+                            background-color: #fff; /* White background */
+                            border-radius: 8px;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Subtle shadow */
+                            overflow: hidden; /* Ensures the border radius clips the table */
+                        }
+                        .table th, .table td {
+                            border-color: #dee2e6;
+                        }
+                        .table thead th {
+                            background-color: #6c757d; /* Dark header for contrast */
+                            color: #ffffff;
+                        }
+                        .table-hover tbody tr:hover {
+                            background-color: #f8f9fa;
+                        }
+                        .btn-custom {
+                            background-color: #007bff; /* Bootstrap primary blue */
+                            color: #ffffff;
+                            border-radius: 5px;
+                            padding: 8px 16px;
+                            margin-top: 8px; /* Margin for spacing */
+                        }
+                        .btn-link-custom {
+                            color: #007bff;
+                            text-decoration: none;
+                            padding: 8px;
+                            margin-top: 20px;
+                            display: inline-block;
+                            border-radius: 5px;
+                            border: 1px solid #007bff; /* Styled link as a button */
+                        }
+                        .btn-link-custom:hover {
+                            text-decoration: underline;
+                        }
+                        .form-container {
+                            margin-bottom: 20px;
+                        }
+                </style>
+            </head>
+            <body>
+                <div class="container mt-5">
+                    <h1 class="header-custom text-center">Books Viewed </h1>
+
+                    <div>
+                        <table class="table table-hover table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Book Name</th>
+                                    <th>Book Author</th>
+                                    <th>Book Genre</th>
+                                    <th>View</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @for(book <- books) {
+                                <tr>
+                                    <td>@book.bname</td>
+                                    <td>@book.bauthor</td>
+                                    <td>@book.bgenre</td>
+                                    <td>
+                                        <a href="@routes.BookController.getBookById(book.bno)" class="btn-link-custom">View Details</a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center">
+                        <a href="@routes.BookController.getBooks" class="btn-link-custom">Go Back</a>
+                    </div>
+                </div>
+            </body>
+        </html>
+    }

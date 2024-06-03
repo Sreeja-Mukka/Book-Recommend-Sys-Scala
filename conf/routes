@@ -11,7 +11,7 @@ POST    /registerSubmit           controllers.UserController.registerSubmit
 
 #books-route
 GET     /books-list                    controllers.BookController.getBooks
-
+GET     /books-list/viewed/:uid    controllers.BookController.booksViewedByUser(uid:Int)
 GET     /adminBooks           controllers.BookController.index
 POST   /adminBooks                     controllers.BookController.createBook
 

@@ -25,7 +25,7 @@ class UserController @Inject()(userrepo: UserRepository,
       val username = args("username").head
       val password = args("password").head
       userrepo.register(username, password).map {
-        case true => Redirect(routes.UserController.login) // Redirect to login on success
+        case true => Redirect(routes.UserController.login)
         case false => BadRequest("Username already exists.")
       }
     }.getOrElse(Future.successful(BadRequest("Form data missing")))
@@ -41,26 +41,33 @@ class UserController @Inject()(userrepo: UserRepository,
         val username = formData("uname").head
         val password = formData("upassword").head
 
-        val userCheck: Future[Boolean] = userrepo.validateUser(username, password).map {
-          case Some(_) => true  // User exists and password is correct
-          case None => false    // User not found or password is incorrect
-        }
-
-        if(username == "admin" && password == "password") {
+        if (username == "admin" && password == "password") {
+          // Directly redirect if it's an admin login
           Future.successful(Redirect(routes.BookController.index))
-        }
-        else{
-          userCheck.flatMap {
-            case true =>
-              Future.successful(Redirect(routes.BookController.getBooks))
-            case false =>
+        } else {
+          // Validate user and get user ID asynchronously
+          userrepo.validateUser(username, password).flatMap {
+            case Some(_) =>
+              // User is valid, get the ID
+              userrepo.getIdByName(username).flatMap {
+                case Some(userId) =>
+                  // Store userId in session and redirect to the books listing
+                  Future.successful(Redirect(routes.BookController.getBooks).withSession("userId" -> userId.toString))
+                case None =>
+                  // Handle unexpected error, e.g., username valid but no ID found
+                  Future.successful(Redirect(routes.UserController.login).flashing("error" -> "User not found"))
+              }
+            case None =>
+              // User validation failed, redirect to login with an error
               Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Invalid username or password"))
           }
         }
       }
       case None =>
+        // Form data not submitted, redirect to login with an error
         Future.successful(Redirect(routes.UserController.login).flashing("error" -> "Form data missing"))
     }
   }
+
 
 }

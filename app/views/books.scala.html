@@ -2,7 +2,7 @@
 @import play.api.mvc.Request
 @import play.api.mvc.Flash
 
-@(books: Seq[Book])(implicit request: Request[_], flash: Flash)
+@(books: Seq[Book],uid:Int)(implicit request: Request[_], flash: Flash)
 
 @main("List of Books") {
     <html lang="en">
@@ -96,9 +96,15 @@
                         </tbody>
                     </table>
                 </div>
+                @if(uid != 0) {
+                    <div class="text-center">
+                        <a href="@routes.BookController.booksViewedByUser(uid)" class="btn-link-custom">View-Books</a>
+                    </div>
+                }
                 <div class="text-center">
                     <a href="@routes.UserController.login" class="btn-link-custom">Logout</a>
                 </div>
+
             </div>
         </body>
     </html>
